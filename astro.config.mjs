@@ -4,9 +4,12 @@ import sitemap from '@astrojs/sitemap';
 import react from '@astrojs/react';
 import tailwind from '@astrojs/tailwind';
 
+// Prefer an explicitly configured site URL, but fall back to Cloudflare's build URL.
+const siteUrl = process.env.PUBLIC_SITE_URL ?? process.env.CF_PAGES_URL ?? 'http://localhost:4321';
+
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://ff0d6e9a.blog-4ni.pages.dev', // Your current Cloudflare Pages URL
+  site: siteUrl,
   integrations: [
     mdx(),
     sitemap(),

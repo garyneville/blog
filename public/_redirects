@@ -1,6 +1,3 @@
-# Redirect all traffic to HTTPS
-https://ff0d6e9a.blog-4ni.pages.dev/* https://ff0d6e9a.blog-4ni.pages.dev/:splat 301!
-
 # Handle admin routes properly
 /admin/* /admin/index.html 200
 

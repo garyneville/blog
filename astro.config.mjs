@@ -6,7 +6,7 @@ import tailwind from '@astrojs/tailwind';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://40726c1b.blog-4ni.pages.dev', // Your actual Cloudflare Pages URL
+  site: 'https://ff0d6e9a.blog-4ni.pages.dev', // Your current Cloudflare Pages URL
   integrations: [
     mdx(),
     sitemap(),

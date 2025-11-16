@@ -1,0 +1,106 @@
+---
+export interface Props {
+  repo: string;
+  repoId: string;
+  category: string;
+  categoryId: string;
+  mapping?: 'pathname' | 'url' | 'title' | 'og:title' | 'specific' | 'number';
+  term?: string;
+  reactionsEnabled?: boolean;
+  emitMetadata?: boolean;
+  inputPosition?: 'top' | 'bottom';
+  theme?: 'light' | 'dark' | 'dark_dimmed' | 'dark_high_contrast' | 
+          'dark_protanopia' | 'dark_tritanopia' | 'light_high_contrast' | 
+          'light_protanopia' | 'light_tritanopia' | 'transparent_dark' | 
+          'preferred_color_scheme';
+  lang?: string;
+  loading?: 'lazy' | 'eager';
+}
+
+const {
+  repo,
+  repoId,
+  category,
+  categoryId,
+  mapping = 'pathname',
+  term,
+  reactionsEnabled = true,
+  emitMetadata = false,
+  inputPosition = 'bottom',
+  theme = 'preferred_color_scheme',
+  lang = 'en',
+  loading = 'lazy'
+} = Astro.props;
+---
+
+<div id="giscus-container" class="mt-8">
+  <script is:inline define:vars={{ 
+    repo, 
+    repoId, 
+    category, 
+    categoryId, 
+    mapping, 
+    term, 
+    reactionsEnabled, 
+    emitMetadata, 
+    inputPosition, 
+    theme, 
+    lang, 
+    loading 
+  }}>
+    // Load giscus script
+    const script = document.createElement('script');
+    script.src = 'https://giscus.app/client.js';
+    script.setAttribute('data-repo', repo);
+    script.setAttribute('data-repo-id', repoId);
+    script.setAttribute('data-category', category);
+    script.setAttribute('data-category-id', categoryId);
+    script.setAttribute('data-mapping', mapping);
+    if (term) script.setAttribute('data-term', term);
+    script.setAttribute('data-strict', '0');
+    script.setAttribute('data-reactions-enabled', reactionsEnabled ? '1' : '0');
+    script.setAttribute('data-emit-metadata', emitMetadata ? '1' : '0');
+    script.setAttribute('data-input-position', inputPosition);
+    script.setAttribute('data-theme', theme);
+    script.setAttribute('data-lang', lang);
+    script.setAttribute('data-loading', loading);
+    script.crossOrigin = 'anonymous';
+    script.async = true;
+
+    document.getElementById('giscus-container').appendChild(script);
+
+    // Theme synchronization
+    const updateGiscusTheme = () => {
+      const iframe = document.querySelector('iframe.giscus-frame');
+      if (iframe) {
+        const isDark = document.documentElement.classList.contains('dark');
+        const newTheme = isDark ? 'dark' : 'light';
+        iframe.contentWindow.postMessage(
+          { giscus: { setConfig: { theme: newTheme } } },
+          'https://giscus.app'
+        );
+      }
+    };
+
+    // Watch for theme changes
+    const observer = new MutationObserver(updateGiscusTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    // Initial theme setup after iframe loads
+    setTimeout(updateGiscusTheme, 1000);
+  </script>
+</div>
+
+<style>
+  #giscus-container {
+    border-top: 1px solid rgb(229 231 235);
+    padding-top: 2rem;
+  }
+  
+  :global(.dark) #giscus-container {
+    border-top-color: rgb(55 65 81);
+  }
+</style>

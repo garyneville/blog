@@ -1,0 +1,195 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// Get all published content
+const blogPosts = await getCollection('blog', ({ data }) => !data.draft);
+const snippets = await getCollection('snippets', ({ data }) => !data.draft);
+const photos = await getCollection('photos', ({ data }) => !data.draft);
+
+// Sort by date
+const recentPosts = blogPosts
+  .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf())
+  .slice(0, 3);
+
+const recentSnippets = snippets
+  .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf())
+  .slice(0, 3);
+
+const recentPhotos = photos
+  .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf())
+  .slice(0, 3);
+---
+
+<BaseLayout 
+  title="Home - Chris Dearnley's Blog"
+  description="Personal blog about development, DevOps, code snippets, and photography"
+>
+  <div class="space-y-20">
+    <!-- Hero Section -->
+    <section class="relative overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10 dark:from-blue-400/5 dark:to-purple-400/5"></div>
+      <div class="relative text-center py-20 px-4">
+        <div class="max-w-4xl mx-auto">
+          <h1 class="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+            Welcome to DevBlog
+          </h1>
+          <p class="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+            A modern blog about <span class="text-blue-600 dark:text-blue-400 font-semibold">development</span>, 
+            <span class="text-purple-600 dark:text-purple-400 font-semibold">DevOps practices</span>, 
+            useful code snippets, and photography.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="/blog" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl">
+              Read Posts
+            </a>
+            <a href="/snippets" class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white px-8 py-3 rounded-xl font-semibold transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl border border-gray-200 dark:border-gray-700">
+              Browse Snippets
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recent Blog Posts -->
+    <section class="relative">
+      <div class="flex items-center justify-between mb-12">
+        <div>
+          <h2 class="text-4xl font-bold mb-2">Latest Posts</h2>
+          <p class="text-gray-600 dark:text-gray-400">Fresh insights and tutorials</p>
+        </div>
+        <a href="/blog" class="group flex items-center space-x-2 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-semibold transition-colors">
+          <span>View all posts</span>
+          <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+          </svg>
+        </a>
+      </div>
+      
+      <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        {recentPosts.map((post) => (
+          <article class="group bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 rounded-2xl p-6 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 hover:-translate-y-2">
+            {post.data.heroImage && (
+              <div class="mb-6 overflow-hidden rounded-xl">
+                <img
+                  src={post.data.heroImage}
+                  alt={post.data.title}
+                  class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+            )}
+            <div class="space-y-3">
+              <h3 class="text-xl font-bold leading-tight">
+                <a href={`/blog/${post.slug}`} class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                  {post.data.title}
+                </a>
+              </h3>
+              <p class="text-gray-600 dark:text-gray-300 line-clamp-3">
+                {post.data.description}
+              </p>
+              <div class="flex items-center justify-between pt-2">
+                <div class="text-sm text-gray-500 dark:text-gray-400">
+                  {post.data.publishDate.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </div>
+                {post.data.tags.length > 0 && (
+                  <div class="flex gap-1">
+                    {post.data.tags.slice(0, 2).map((tag) => (
+                      <span class="px-2 py-1 text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 rounded-lg font-medium">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <!-- Recent Snippets -->
+    <section>
+      <div class="flex items-center justify-between mb-12">
+        <div>
+          <h2 class="text-4xl font-bold mb-2">Code Snippets</h2>
+          <p class="text-gray-600 dark:text-gray-400">Quick solutions and useful commands</p>
+        </div>
+        <a href="/snippets" class="group flex items-center space-x-2 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-semibold transition-colors">
+          <span>View all snippets</span>
+          <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+          </svg>
+        </a>
+      </div>
+      
+      <div class="grid gap-6 md:grid-cols-2">
+        {recentSnippets.map((snippet) => (
+          <article class="group bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 rounded-2xl p-6 hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 hover:-translate-y-1">
+            <div class="flex items-start justify-between mb-4">
+              <h3 class="text-lg font-bold">
+                <a href={`/snippets/${snippet.slug}`} class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                  {snippet.data.title}
+                </a>
+              </h3>
+              {snippet.data.language && (
+                <span class="px-3 py-1 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full font-mono font-medium">
+                  {snippet.data.language}
+                </span>
+              )}
+            </div>
+            <p class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
+              {snippet.data.description}
+            </p>
+            <div class="flex items-center justify-between">
+              <div class="text-sm text-gray-500 dark:text-gray-400">
+                {snippet.data.publishDate.toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                })}
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="px-2 py-1 text-xs bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300 rounded-lg font-medium capitalize">
+                  {snippet.data.category}
+                </span>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <!-- Recent Photos -->
+    {recentPhotos.length > 0 && (
+      <section>
+        <div class="flex items-center justify-between mb-8">
+          <h2 class="text-3xl font-bold">Recent Photos</h2>
+          <a href="/photos" class="text-blue-600 hover:underline">View all photos →</a>
+        </div>
+        
+        <div class="grid gap-4 md:grid-cols-3">
+          {recentPhotos.map((photo) => (
+            <article class="group">
+              <a href={`/photos/${photo.slug}`}>
+                <img
+                  src={photo.data.image}
+                  alt={photo.data.alt}
+                  class="w-full h-64 object-cover rounded-lg group-hover:opacity-90 transition-opacity"
+                />
+                <h3 class="text-lg font-semibold mt-2 group-hover:text-blue-600 transition-colors">
+                  {photo.data.title}
+                </h3>
+                <div class="text-sm text-gray-500 dark:text-gray-400">
+                  {photo.data.publishDate.toLocaleDateString()}
+                </div>
+              </a>
+            </article>
+          ))}
+        </div>
+      </section>
+    )}
+  </div>
+</BaseLayout>

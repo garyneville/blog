@@ -1,0 +1,93 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import GiscusComments from '../components/GiscusComments.astro';
+
+export interface Props {
+  title: string;
+  description?: string;
+  publishDate: Date;
+  updatedDate?: Date;
+  heroImage?: string;
+  tags?: string[];
+  author?: string;
+}
+
+const { title, description, publishDate, updatedDate, heroImage, tags = [], author = 'Chris Dearnley' } = Astro.props;
+
+const formattedDate = publishDate.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+const formattedUpdatedDate = updatedDate?.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<BaseLayout title={title} description={description} image={heroImage} type="article">
+  <article class="prose prose-lg max-w-none dark:prose-invert">
+    <header class="mb-8">
+      {heroImage && (
+        <img
+          src={heroImage}
+          alt={title}
+          class="w-full h-64 object-cover rounded-lg mb-6"
+        />
+      )}
+      
+      <h1 class="text-4xl font-bold mb-4">{title}</h1>
+      
+      <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4">
+        <div class="flex items-center">
+          <span>By {author}</span>
+        </div>
+        <div class="flex items-center">
+          <time datetime={publishDate.toISOString()}>
+            {formattedDate}
+          </time>
+        </div>
+        {updatedDate && (
+          <div class="flex items-center">
+            <span>Updated: </span>
+            <time datetime={updatedDate.toISOString()}>
+              {formattedUpdatedDate}
+            </time>
+          </div>
+        )}
+      </div>
+
+      {tags.length > 0 && (
+        <div class="flex flex-wrap gap-2 mb-6">
+          {tags.map((tag) => (
+            <span class="px-3 py-1 text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-full">
+              #{tag}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {description && (
+        <p class="text-xl text-gray-600 dark:text-gray-300 font-medium">
+          {description}
+        </p>
+      )}
+    </header>
+
+    <div class="content">
+      <slot />
+    </div>
+  </article>
+
+  <!-- Comments section -->
+  <div class="mt-16">
+    <GiscusComments
+      repo="garyneville/blog"
+      repoId="YOUR_REPO_ID"
+      category="General"
+      categoryId="YOUR_CATEGORY_ID"
+    />
+  </div>
+</BaseLayout>

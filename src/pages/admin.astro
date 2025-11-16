@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Content Manager</title>
+    <!-- Netlify Identity Widget -->
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  </head>
+  <body>
+    <!-- Include the script that builds the page and powers Decap CMS -->
+    <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+    <script>
+      window.CMS_MANUAL_INIT = true;
+      
+      // Check if we're in development or production
+      const isLocalhost = window.location.hostname === 'localhost';
+      
+      // Wait for CMS to be available
+      document.addEventListener('DOMContentLoaded', function() {
+        CMS.init({
+          config: {
+            load_config_file: false,
+            backend: {
+              name: isLocalhost ? 'git-gateway' : 'github',
+              repo: 'garyneville/blog',
+              branch: 'main'
+            },
+            local_backend: isLocalhost,
+            media_folder: 'public/images',
+            public_folder: '/images',
+            collections: [
+              {
+                name: 'blog',
+                label: 'Blog Posts',
+                folder: 'src/content/blog',
+                create: true,
+                slug: '{{year}}-{{month}}-{{day}}-{{slug}}',
+                fields: [
+                  { label: 'Title', name: 'title', widget: 'string' },
+                  { label: 'Description', name: 'description', widget: 'text' },
+                  { label: 'Author', name: 'author', widget: 'string', default: 'Chris Dearnley' },
+                  { label: 'Publish Date', name: 'publishDate', widget: 'datetime' },
+                  { label: 'Hero Image', name: 'heroImage', widget: 'image', required: false },
+                  { label: 'Tags', name: 'tags', widget: 'list', default: [] },
+                  { label: 'Draft', name: 'draft', widget: 'boolean', default: false },
+                  { label: 'Body', name: 'body', widget: 'markdown' }
+                ]
+              },
+              {
+                name: 'snippets',
+                label: 'Code Snippets',
+                folder: 'src/content/snippets',
+                create: true,
+                slug: '{{year}}-{{month}}-{{day}}-{{slug}}',
+                fields: [
+                  { label: 'Title', name: 'title', widget: 'string' },
+                  { label: 'Description', name: 'description', widget: 'text' },
+                  { label: 'Publish Date', name: 'publishDate', widget: 'datetime' },
+                  { label: 'Language', name: 'language', widget: 'string', required: false },
+                  { 
+                    label: 'Category', 
+                    name: 'category', 
+                    widget: 'select', 
+                    options: ['devops', 'javascript', 'python', 'bash', 'docker', 'kubernetes', 'other'],
+                    default: 'other'
+                  },
+                  { label: 'Tags', name: 'tags', widget: 'list', default: [] },
+                  { label: 'Draft', name: 'draft', widget: 'boolean', default: false },
+                  { label: 'Code', name: 'body', widget: 'markdown' }
+                ]
+              }
+            ]
+          }
+        });
+      });
+
+      // Netlify Identity for authentication (production only)
+      if (!window.location.hostname.includes('localhost')) {
+        // Initialize Netlify Identity
+        if (window.netlifyIdentity) {
+          window.netlifyIdentity.on("init", user => {
+            if (!user) {
+              window.netlifyIdentity.on("login", () => {
+                document.location.href = "/admin/";
+              });
+            }
+          });
+        }
+      }
+    </script>
+  </body>
+</html>

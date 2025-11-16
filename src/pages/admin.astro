@@ -18,17 +18,18 @@
       
       // Wait for CMS to be available
       document.addEventListener('DOMContentLoaded', function() {
-        CMS.init({
-          config: {
-            load_config_file: false,
-            backend: {
-              name: isLocalhost ? 'git-gateway' : 'github',
-              repo: 'garyneville/blog',
-              branch: 'main'
-            },
-            local_backend: isLocalhost,
-            media_folder: 'public/images',
-            public_folder: '/images',
+        const config = {
+          load_config_file: false,
+          backend: isLocalhost ? {
+            name: 'git-gateway'
+          } : {
+            name: 'github',
+            repo: 'garyneville/blog',
+            branch: 'main'
+          },
+          local_backend: isLocalhost,
+          media_folder: 'public/images',
+          public_folder: '/images',
             collections: [
               {
                 name: 'blog',
@@ -71,8 +72,9 @@
                 ]
               }
             ]
-          }
-        });
+        };
+        
+        CMS.init({ config });
       });
 
       // Netlify Identity for authentication (production only)
